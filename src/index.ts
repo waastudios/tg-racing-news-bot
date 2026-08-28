@@ -1,8 +1,9 @@
-import { Bot, webhookCallback } from "grammy";
+import { Bot, webhookCallback, InlineKeyboard } from "grammy";
 import { Env, getUser, updateUserLanguage, updateUserTimezone } from "./db/queries";
 import { handleStart } from "./handlers/menuHandler";
 import { handleScheduled } from "./cron/scheduledHandler";
 import { renderStandings } from "./handlers/standingsHandler";
+import { renderFutureSchedule, handleSubscribeToggle } from "./handlers/scheduleHandler";
 import { 
     getRacingSeriesPage, 
     getStandingsCategory, 
@@ -10,8 +11,7 @@ import {
     getMainMenu, 
     getSettingsMenu, 
     getTimezoneMenu,
-    getLanguageMenu,
-    getFutureRacesList
+    getLanguageMenu
 } from "./keyboards/racingKeyboards";
 
 export default {
@@ -82,19 +82,18 @@ export default {
                     await ctx.editMessageText("请选择分类：", { reply_markup: getStandingsCategory(series) });
                 } else if (data.startsWith("sch:cat:")) {
                     const series = data.split(":")[2];
-                    await ctx.editMessageText("📅 请选择该赛事的场次：", { reply_markup: getFutureRacesList(series) });
+                    await renderFutureSchedule(ctx, env, series, 1);
+                } else if (data.startsWith("sch:page:")) {
+                    const parts = data.split(":");
+                    const series = parts[2];
+                    const page = parseInt(parts[3]);
+                    await renderFutureSchedule(ctx, env, series, page);
                 } else if (data.startsWith("std:view:")) {
                     const [_, __, series, category, page] = data.split(":");
                     await renderStandings(ctx, env, series, category, parseInt(page));
-                } else if (data.startsWith("sch:race:")) {
-                    const parts = data.split(":");
-                    const series = parts[2];
-                    const raceIdx = parts[3];
-                    await ctx.editMessageText(`📅 ${series.toUpperCase()} 未来赛事 #${raceIdx}\n(赛事详细日程与订阅功能正在加载中)`, {
-                        reply_markup: new InlineKeyboard()
-                            .text("↩️ 返回系列", `sch:cat:${series}`)
-                            .text("🏠 返回主页", "nav:main")
-                    });
+                } else if (data.startsWith("sub:toggle:")) {
+                    const raceId = parseInt(data.split(":")[2]);
+                    await handleSubscribeToggle(ctx, env, raceId);
                 }
             } catch (e) {
                 console.error("Callback handling error:", e);
