@@ -26,7 +26,7 @@ export const getRacingSeriesPage = (page: number, mode: 'std' | 'sch') => {
           .row()
           .text("🇺🇸 IMSA", `${prefix}:cat:imsa`).text("🏁 NASCAR", `${prefix}:cat:nascar`).text("🇺🇸 IndyCar", `${prefix}:cat:indy`)
           .row()
-          .text("🏆 GT World", `${prefix}:cat:gt`).text("🇲🇴 澳门 GP", `${prefix}:cat:macau`);
+          .text("🏆 GT World", `${prefix}:cat:gt`);
     }
     
     kb.row()
@@ -52,7 +52,7 @@ export const getFutureRacesList = (series: string) => {
 
 export const getStandingsCategory = (series: string) => {
     const kb = new InlineKeyboard();
-    if (series === "f1" || series === "f2") {
+    if (series === "f1" || series === "f2" || series === "f3" || series === "f1a") {
         kb.text("👤 车手积分榜", `std:view:${series}:drivers:1`)
           .text("🏎️ 车队积分榜", `std:view:${series}:teams:1`);
     } else if (series === "wec") {
@@ -61,8 +61,25 @@ export const getStandingsCategory = (series: string) => {
           .row()
           .text("👤 LMGT3 车手", `std:view:wec:lmgt3_d:1`)
           .text("🏎️ LMGT3 车队", `std:view:wec:lmgt3_t:1`);
-    } else if (series === "wsbk") {
-        kb.text("🏍️ SBK", `std:view:wsbk:sbk:1`).text("🏍️ SSP", `std:view:wsbk:ssp:1`).text("🏍️ SPB", `std:view:wsbk:spb:1`);
+    } else if (series === "wsbk" || series === "motogp" || series === "m2" || series === "m3") {
+        kb.text("🏍️ 车手积分榜", `std:view:${series}:riders:1`)
+          .text("🏍️ 车队积分榜", `std:view:${series}:teams:1`);
+    } else if (series === "fe") {
+        kb.text("👤 车手积分榜", `std:view:fe:drivers:1`)
+          .text("🏎️ 车队/制造商积分榜", `std:view:fe:teams:1`);
+    } else if (series === "nascar") {
+        kb.text("🏆 季后赛/杯赛积分榜", `std:view:nascar:drivers:1`);
+    } else if (series === "indy") {
+        kb.text("👤 IndyCar 车手积分榜", `std:view:indy:drivers:1`);
+    } else if (series === "imsa") {
+        kb.text("👤 GTP 车手积分榜", `std:view:imsa:drivers:1`)
+          .text("🏎️ GTD 车队积分榜", `std:view:imsa:teams:1`);
+    } else if (series === "wrc" || series === "erc") {
+        kb.text("🌲 WRC 车手总积分榜", `std:view:${series}:drivers:1`)
+          .text("🏎️ WRC 车队总积分榜", `std:view:${series}:teams:1`);
+    } else if (series === "gt") {
+        kb.text("🏆 GT World 车手积分榜", `std:view:gt:drivers:1`)
+          .text("🏆 GT World 车队积分榜", `std:view:gt:teams:1`);
     }
     kb.row().text("↩️ 上一步", "std:p:1").text("🏠 返回主页", "nav:main");
     return kb;
@@ -116,4 +133,5 @@ export const getTimezoneMenu = () => {
         .text("↩️ 上一步菜单", "nav:main:settings")
         .text("🏠 返回主页", "nav:main");
 };
+
 
