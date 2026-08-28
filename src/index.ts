@@ -10,7 +10,8 @@ import {
     getMainMenu, 
     getSettingsMenu, 
     getTimezoneMenu,
-    getLanguageMenu
+    getLanguageMenu,
+    getFutureRacesList
 } from "./keyboards/racingKeyboards";
 
 export default {
@@ -20,7 +21,7 @@ export default {
         bot.command("start", (ctx) => handleStart(ctx, env));
         bot.command("schedule", async (ctx) => {
             await ctx.reply("📅 未来赛事时刻表与开赛提醒订阅：\n请选择您想查看的赛事分类：", {
-                reply_markup: getRacingSeriesPage(1)
+                reply_markup: getRacingSeriesPage(1, 'sch')
             });
         });
 
@@ -32,9 +33,10 @@ export default {
                 if (data === "nav:main") {
                     await ctx.editMessageText("主菜单：", { reply_markup: getMainMenu() });
                 } else if (data === "nav:main:standings") {
-                    await ctx.editMessageText("请选择赛事系列：", { reply_markup: getRacingSeriesPage(1) });
-                } else if (data === "sch:p:all:1") {
-                    await ctx.editMessageText("📅 未来赛事：", { reply_markup: getRacingSeriesPage(1) });
+                    await ctx.editMessageText("请选择赛事系列：", { reply_markup: getRacingSeriesPage(1, 'std') });
+                } else if (data === "sch:p:all:1" || data === "sch:p:all:2") {
+                    const page = data.endsWith("2") ? 2 : 1;
+                    await ctx.editMessageText("📅 未来赛事：", { reply_markup: getRacingSeriesPage(page, 'sch') });
                 } else if (data === "nav:main:settings") {
                     let lang = "zh-CN";
                     let tz = "Asia/Shanghai";
@@ -71,13 +73,28 @@ export default {
                     await ctx.editMessageText("⚙️ 设置", { reply_markup: getSettingsMenu(lang, tz) });
                 } else if (data.startsWith("std:p:")) {
                     const page = parseInt(data.split(":")[2]);
-                    await ctx.editMessageText("请选择赛事：", { reply_markup: getRacingSeriesPage(page) });
+                    await ctx.editMessageText("请选择赛事：", { reply_markup: getRacingSeriesPage(page, 'std') });
+                } else if (data.startsWith("sch:p:")) {
+                    const page = parseInt(data.split(":")[2]);
+                    await ctx.editMessageText("📅 未来赛事：", { reply_markup: getRacingSeriesPage(page, 'sch') });
                 } else if (data.startsWith("std:cat:")) {
                     const series = data.split(":")[2];
                     await ctx.editMessageText("请选择分类：", { reply_markup: getStandingsCategory(series) });
+                } else if (data.startsWith("sch:cat:")) {
+                    const series = data.split(":")[2];
+                    await ctx.editMessageText("📅 请选择该赛事的场次：", { reply_markup: getFutureRacesList(series) });
                 } else if (data.startsWith("std:view:")) {
                     const [_, __, series, category, page] = data.split(":");
                     await renderStandings(ctx, env, series, category, parseInt(page));
+                } else if (data.startsWith("sch:race:")) {
+                    const parts = data.split(":");
+                    const series = parts[2];
+                    const raceIdx = parts[3];
+                    await ctx.editMessageText(`📅 ${series.toUpperCase()} 未来赛事 #${raceIdx}\n(赛事详细日程与订阅功能正在加载中)`, {
+                        reply_markup: new InlineKeyboard()
+                            .text("↩️ 返回系列", `sch:cat:${series}`)
+                            .text("🏠 返回主页", "nav:main")
+                    });
                 }
             } catch (e) {
                 console.error("Callback handling error:", e);
