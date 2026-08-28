@@ -1,0 +1,17 @@
+name = "tg-racing-news-bot"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "racing_bot_d1"
+database_id = "xxxxxx"
+
+[triggers]
+crons = [
+  "0 19 * * 0",     # 每周日 UTC 19:00 (即北京时间周一 03:00) 同步赛历
+  "0 2 * * 3,4",    # 每周三、周四 UTC 02:00 抓取本周详细各节练习赛/排位/正赛时间
+  "0 * * * 5,6,0",  # 周五至周日每小时检查比赛状态并按需同步积分榜
+  "*/10 * * * *"    # 每 10 分钟检查一次 24h / 1h 赛事开赛提醒推送
+]
