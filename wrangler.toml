@@ -1,9 +1,0 @@
-name = "tg-racing-news-bot"
-main = "src/index.ts"
-compatibility_date = "2024-09-01"
-compatibility_flags = ["nodejs_compat"]
-
-[[d1_databases]]
-binding = "DB"
-database_name = "racing_bot_d1"
-database_id = "2386a940-ebcd-49a5-9c10-6c16a7b2c73c"
