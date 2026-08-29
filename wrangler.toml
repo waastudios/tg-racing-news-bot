@@ -1,0 +1,16 @@
+name = "tg-racing-news-bot"
+main = "src/index.ts"
+compatibility_date = "2025-02-14"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "racing-db"
+database_id = "REPLACE_WITH_YOUR_D1_ID"
+migrations_dir = "migrations"
+
+[triggers]
+crons = ["0 * * * *"]
+
+[vars]
+# TELEGRAM_TOKEN is set via `wrangler secret put TELEGRAM_TOKEN`
